@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-"""Convert MBPP to a Desc2Synth dataset."""
+"""Convert HumanEval to a SynthesisRtcExample dataset."""
 
 from collections.abc import Iterator, Sequence
 import gzip

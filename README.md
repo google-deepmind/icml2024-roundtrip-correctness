@@ -24,7 +24,7 @@ Then, run the RTC sampling loop.
 python roundtrip_correctness/runner.py \
       --gin_file path/to/config.gin \
       --gin_param="OUTPUT_PATH='/path/to/humaneval-rtc-samples'" \
-      --gin_param="HTML_PATH='/path/to/he-samples-visualization.html'" \
+      --gin_param="HTML_PATH='/path/to/the-samples-visualization.html'" \
       --gin_param="MODEL_PATH='http://localhost:8001/v1/completions@/models/bigcode-starcoder2-15b'" \
       --gin_param="INPUT_PATH='/path/to/humaneval-inputs.jsonl.gz'"
 ```
@@ -124,6 +124,49 @@ Finally, obtain the RTC statistics
 python roundtrip_correctness/summarize_results.py --input_data /path/to/evaluated-samples.jsonl.gz
 ```
 
+
+### Computing EditingRTC on CodeReviewer
+
+First, download the `Code_Refinement.zip` file from the [CodeReviewer data release](https://zenodo.org/records/6900648).
+Unzip the file and run the following command to format the test examples.
+
+```bash
+python roundtrip_correctness/synthesis_rtc/codereviewer_to_rtc_example.py \
+      --input_path /path/to/Code_Refinement/ref-test.jsonl \
+      --out_path /path/to/codereviewer-inputs.jsonl.gz
+```
+
+Then, run the RTC sampling loop.
+
+```bash
+python roundtrip_correctness/runner.py \
+      --gin_file path/to/config.gin \
+      --gin_param="OUTPUT_PATH='/path/to/codereviewer-rtc-samples'" \
+      --gin_param="HTML_PATH='/path/to/the-samples-visualization.html'" \
+      --gin_param="MODEL_PATH='http://localhost:8001/v1/completions@/models/bigcode-starcoder2-15b'" \
+      --gin_param="INPUT_PATH='/path/to/codereviewer-inputs.jsonl.gz'"
+```
+
+A sample configuration (with the EditingRTC defaults) is found at
+[`ertc_sample_config.gin`](./ertc_sample_config.gin).
+
+
+Next compute the semantic equivalence of the backward samples by using exact
+match as a similarity function.
+
+```bash
+python roundtrip_correctness/editing_rtc/eval_codereviewer.py \
+      --samples_path /path/to/codereviewer-rtc-samples-generation.jsonl.gz \
+      --output_file /path/to/evaluated-samples.jsonl.gz
+```
+Note that the `--samples_path` is the path previously using in the `OUTPUT_PATH`
+gin parameter.
+
+Finally, compute the summary RTC statistics
+
+```bash
+python roundtrip_correctness/summarize_results.py --input_data /path/to/evaluated-samples.jsonl.gz
+```
 
 ### RTC data structures
 The core RTC data structures are defined in [`rtc_data.py`](./rtc_data.py).

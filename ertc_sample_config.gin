@@ -1,8 +1,8 @@
 from __gin__ import dynamic_registration
 
 from roundtrip_correctness import rtc
-from roundtrip_correctness.synthesis_rtc import examples as srtc_examples
-from roundtrip_correctness.synthesis_rtc import task as srtc
+from roundtrip_correctness.editing_rtc import task as ertc
+from roundtrip_correctness.editing_rtc import examples as ertc_examples
 from roundtrip_correctness import oai_compatible_prompt
 from roundtrip_correctness import human_prompt
 
@@ -14,35 +14,28 @@ HTML_PATH = %gin.REQUIRED
 
 
 rtc.run:
-  task=@srtc.SynthesisRtc()
+  task=@ertc.EditingRtc()
   input_data_path=%INPUT_PATH
   output_data_path=%OUTPUT_PATH
   html_output_file=%HTML_PATH
 
-srtc.SynthesisRtc:
-  # Use the dummy Human prompt for debugging.
-  # forward_prompt_factory = @fw_model/human_prompt.get_human_prompt_factory()
-  # backward_prompt_factory = @bw_model/human_prompt.get_human_prompt_factory()
-
+ertc.EditingRtc:
   forward_prompt_factory = @fw_model/oai_compatible_prompt.get_oai_compatible_prompt_factory()
   backward_prompt_factory = @bw_model/oai_compatible_prompt.get_oai_compatible_prompt_factory()
-  forward_prompt_instruction = @srtc_examples.FWD_TASK_DESCRIPTION()
-  backward_prompt_instruction = @srtc_examples.BWD_TASK_DESCRIPTION()
-  forward_few_shot_examples = @srtc_examples.EXAMPLES()
-  backward_few_shot_examples = @srtc_examples.EXAMPLES()
-  max_forward_generation_len = 128
-  max_backward_generation_len = 512
+  forward_prompt_instruction = @ertc_examples.FWD_TASK_DESCRIPTION()
+  backward_prompt_instruction = @ertc_examples.BWD_TASK_DESCRIPTION()
+  forward_few_shot_examples = @ertc_examples.EXAMPLES()
+  backward_few_shot_examples = @ertc_examples.EXAMPLES()
+  max_forward_generation_len = 256
+  max_backward_generation_len = 1024
   n_forward_samples= 3
   n_backward_samples= 1
-  region_start_text= '<<<region start>>>'
-  region_end_text = '<<<region end>>>'
   example_separator_token = '\n\n'
-
 
 fw_model/oai_compatible_prompt.get_oai_compatible_prompt_factory:
   model_url = %MODEL_PATH
   max_concurrent_requests = 10
-  temperature = 0.8
+  temperature = 1.0
 
 bw_model/oai_compatible_prompt.get_oai_compatible_prompt_factory:
   model_url = %MODEL_PATH
