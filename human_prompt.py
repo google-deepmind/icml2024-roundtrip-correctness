@@ -24,7 +24,7 @@ import colorama
 from roundtrip_correctness import llm_interface as llm
 
 
-def _print_to_out(x: str) -> None:
+def _print_to_out(x) -> None:
   print(x, end="")
 
 
