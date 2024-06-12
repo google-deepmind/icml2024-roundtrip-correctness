@@ -21,7 +21,7 @@ from roundtrip_correctness import rtc_data as rtcd
 from roundtrip_correctness import rtc_task
 
 
-class _RTCTaskStub(rtc_task.RoundTripCorrecntessTask[str]):
+class _RTCTaskStub(rtc_task.RoundTripCorrectnessTask[str]):
 
   def _format_datapoint_for_forward(self, datapoint: str) -> tuple[str, str]:
     return (

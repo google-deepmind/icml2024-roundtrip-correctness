@@ -48,7 +48,7 @@ class EditingRtcExample:
 
 
 @gin.configurable
-class EditingRtc(rtct.RoundTripCorrecntessTask[EditingRtcExample]):
+class EditingRtc(rtct.RoundTripCorrectnessTask[EditingRtcExample]):
   """A code edit <-> natural language description RTC task."""
 
   def __init__(

@@ -23,7 +23,9 @@ import colorama
 
 from roundtrip_correctness import llm_interface as llm
 
-_print_to_out = lambda x: print(x, end="")
+
+def _print_to_out(x: str) -> None:
+  print(x, end="")
 
 
 class HumanPrompt(llm.InteractivePromptInterface):

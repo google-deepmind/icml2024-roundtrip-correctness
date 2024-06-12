@@ -1,11 +1,30 @@
 # Round-trip Correctness
+Round-trip correctness (RTC) is a methodology for evaluating code generation and
+editing capabilities of LLMs without human-provided annotations. This allows
+us to more cheaply evaluate LLMs across a wider range of coding domains and
+tasks.
 
-This is the code that accompanies ["Unsupervised Evaluation of Code LLMs with Round-Trip Correctness"](https://arxiv.org/abs/2402.08699). ICML 2024.
+The key idea of RTC is to ask an LLM to first perform an action (_e.g._,
+describe a region of code) and then to ask it to perform the reverse one
+(_e.g._, synthesize code based on the previously generated description).
+Finally, we can use some automated method (_e.g._ unit test execution) to check
+that the round-trip was successful.
+
+This repository contains the code that accompanies ["Unsupervised Evaluation of Code LLMs with Round-Trip Correctness"](https://arxiv.org/abs/2402.08699). ICML 2024.
 
 ## Installation
 
-To run this repository please clone this repository and install the dependencies
-in `requirements.txt`.
+To use this code, a working Python 3.9 (or higher) installation is required.
+Then run the following commands to clone this repository, install dependencies,
+and set the `PYTHONPATH`.
+
+```
+git clone https://github.com/google-deepmind/icml2024-roundtrip-correctness roundtrip_correctness
+python3 -m venv venv
+source venv/bin/activate
+pip install -r roundtrip_correctness/requirements.txt
+export PYTHONPATH=$PWD
+```
 
 ## Usage
 
@@ -17,12 +36,16 @@ First, generate the input examples
 python roundtrip_correctness/synthesis_rtc/humaneval_to_rtc_example.py \
       --out_path /path/to/humaneval-inputs.jsonl.gz
 ```
+This will take 1-2 minutes since it requires downloading HumanEval from the
+Internet.
 
-Then, run the RTC sampling loop.
+Then, run the RTC sampling loop, which should take 15-60 minutes depending
+on the throughput of the LLM and the `max_concurrent_requests` configuration
+in `/path/to/config.gin`.
 
 ```bash
 python roundtrip_correctness/runner.py \
-      --gin_file path/to/config.gin \
+      --gin_file /path/to/config.gin \
       --gin_param="OUTPUT_PATH='/path/to/humaneval-rtc-samples'" \
       --gin_param="HTML_PATH='/path/to/the-samples-visualization.html'" \
       --gin_param="MODEL_PATH='http://localhost:8001/v1/completions@/models/bigcode-starcoder2-15b'" \
@@ -36,7 +59,7 @@ A sample configuration (with the SynthesisRTC defaults) is found at
 
 
 Next compute the semantic equivalence of the backward samples by using unit
-test as a similarity function.
+test as a similarity function. This should take about 5-10 minutes.
 
 ```bash
 python roundtrip_correctness/synthesis_rtc/eval_humaneval.py \
@@ -59,6 +82,8 @@ code.
 
 First, extract the input examples by pointing to a folder `/path/to/input/code/`
 containing the relevant code files (e.g., the root folder of a git repository).
+This should take a few minutes and generally depends on the size of the
+codebase.
 
 ```
 python roundtrip_correctness/synthesis_rtc/example_gen_cli.py \
@@ -169,7 +194,7 @@ python roundtrip_correctness/summarize_results.py --input_data /path/to/evaluate
 ```
 
 ### RTC data structures
-The core RTC data structures are defined in [`rtc_data.py`](./rtc_data.py).
+The core RTC data structures are defined in [`rtc_data.py`](rtc_data.py).
 
 * `GenerationSamplesForDatapoint` contains a set of LLM generation samples for
       a single datapoint.

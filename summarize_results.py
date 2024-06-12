@@ -30,8 +30,8 @@ import rich.table
 
 from roundtrip_correctness import rtc_data as rtcd
 
-_INPUT_DATA = flags.DEFINE_string(
-    "input_data", None, "Input data", required=True
+_INPUT_DATA_PATH = flags.DEFINE_string(
+    "input_data_path", None, "Input data", required=True
 )
 _OUTPUT_PER_EXAMPLE_STATS = flags.DEFINE_string(
     "output_per_example_stats", None, "Output per-example stats to a json file."
@@ -45,7 +45,7 @@ def main(argv: Sequence[str]) -> None:
   def example_to_group_id(example) -> str:
     return example["filename"].split("::")[0]
 
-  generation_path = _INPUT_DATA.value
+  generation_path = _INPUT_DATA_PATH.value
 
   per_group_stats = collections.defaultdict(
       lambda: collections.defaultdict(list)
@@ -54,12 +54,11 @@ def main(argv: Sequence[str]) -> None:
   if not os.path.exists(generation_path):
     raise FileNotFoundError(f"{generation_path} does not exist.")
 
-  table = rich.table.Table(title=f"Stats for {_INPUT_DATA.value}")
+  table = rich.table.Table(title=f"Stats for {_INPUT_DATA_PATH.value}")
   table.add_column("Name")
   table.add_column("Avg", justify="right")
 
-  # Get the generation scores
-  gen_scores = collections.defaultdict(list)
+  generation_scores = collections.defaultdict(list)
   with gzip.open(open(generation_path, "rb")) as f:
     try:
       for line in f:
@@ -71,14 +70,14 @@ def main(argv: Sequence[str]) -> None:
         )
         sample_scores = sample.compute_scores()
         for metric_name, metric_value in sample_scores.items():
-          gen_scores[metric_name].append(metric_value)
+          generation_scores[metric_name].append(metric_value)
           per_group_stats[example_to_group_id(sample.samples.datapoint)][
               metric_name
           ].append(metric_value)
     except EOFError:
       print("Could not load entire file.")
 
-  for metric_name, metric_values in gen_scores.items():
+  for metric_name, metric_values in generation_scores.items():
     table.add_row(
         metric_name,
         f"{np.mean(metric_values):.3f}",

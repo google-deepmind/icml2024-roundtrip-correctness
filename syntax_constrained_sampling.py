@@ -26,6 +26,9 @@ import numpy as np
 import py_tree_sitter as ts
 
 
+Predicate = Callable[[ts.Node], bool]
+
+
 @dataclasses.dataclass(frozen=True)
 class SampledSpan:
   # The start-end range in bytes.
@@ -47,8 +50,8 @@ def visit_all_children(node: ts.Node) -> Iterator[ts.Node]:
 
 def sample(
     tree: ts.Tree,
-    is_eligible_subtree_predicate: Callable[[ts.Node], bool],
-    exclude_node_predicate: Callable[[ts.Node], bool],
+    is_eligible_subtree_predicate: Predicate,
+    exclude_node_predicate: Predicate,
     visit_children: Callable[[ts.Node], Iterator[ts.Node]] = visit_all_children,
     min_bytes_length: int = 8,
     max_bytes_length: int = 1024,
@@ -249,8 +252,8 @@ def _weight_candidates(
 
 def _collect_eligible_nodes(
     tree: ts.Tree,
-    is_eligible_subtree_predicate: Callable[[ts.Node], bool],
-    exclude_node_predicate: Callable[[ts.Node], bool],
+    is_eligible_subtree_predicate: Predicate,
+    exclude_node_predicate: Predicate,
     visit_children: Callable[[ts.Node], Iterator[ts.Node]],
     min_bytes_length: int,
     max_bytes_length: int,

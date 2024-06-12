@@ -90,7 +90,7 @@ class SynthesisRtcExample:
 
 
 @gin.configurable
-class SynthesisRtc(rtct.RoundTripCorrecntessTask[SynthesisRtcExample]):
+class SynthesisRtc(rtct.RoundTripCorrectnessTask[SynthesisRtcExample]):
   """A code span <-> natural language description RTC task."""
 
   def __init__(

@@ -40,7 +40,7 @@ _LOG_PROMPTS_AND_RESPONSES = flags.DEFINE_string(
 _TInput = TypeVar('_TInput', bound=dataclasses_json.DataClassJsonMixin)
 
 
-class RoundTripCorrecntessTask(Generic[_TInput], abc.ABC):
+class RoundTripCorrectnessTask(Generic[_TInput], abc.ABC):
   """An abstract class for roundtrip correctness evaluation tasks.
 
   Implementors of this class need to be able to:

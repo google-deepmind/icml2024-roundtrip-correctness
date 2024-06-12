@@ -50,7 +50,7 @@ def _compute_hash(json_str) -> str:
 
 @gin.configurable
 async def run(
-    task: rtct.RoundTripCorrecntessTask = gin.REQUIRED,
+    task: rtct.RoundTripCorrectnessTask = gin.REQUIRED,
     input_data_path: str = gin.REQUIRED,
     output_data_path: str = gin.REQUIRED,
     html_output_file: str | None = gin.REQUIRED,
